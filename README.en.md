@@ -8,7 +8,7 @@ An OpenClaw backup skill for local deduplicated snapshots, offsite archives, sch
 
 </div>
 
-## Overview
+## Introduction
 
 `openclaw-backup-skill` is a backup skill for OpenClaw.
 
@@ -61,8 +61,6 @@ https://github.com/Liu-Bot24/openclaw-backup-skill.git
 Please finish the installation and go straight into the initial configuration.
 If it fails, tell me why. If it succeeds, tell me the final configuration.
 ```
-
-The same text is also available in [docs/OPENCLAW_INSTALL_PROMPT.md](docs/OPENCLAW_INSTALL_PROMPT.md).
 
 ## Initial Configuration
 

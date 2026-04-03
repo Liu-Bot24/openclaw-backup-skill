@@ -28,17 +28,18 @@ python3 install.py install-openclaw --workspace /path/to/.openclaw/workspace
 python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py setup-plan --json
 ```
 
-然后围绕这些信息完成确认：
+然后把返回结果里的 `recommended_questions` 当作首次配置清单。
 
-- 是否开启自动备份
-- 自动节奏是手动、每周一次、两周一次，还是自定义
-- 本机快照是否开启
-- 本机快照目录
-- 本机最多保留几份
-- 是否开启离机归档
-- 如果开启离机归档：确认一个稳定可写的 SMB 共享路径
-- 容量提醒阈值
-- 失败或告警是否回传最近一次交互渠道
+必须遵守：
+
+- 默认先整理成一份“推荐配置摘要”，一次性发给用户确认，不要把首次配置拆成一问一答。
+- 如果用户表示“直接采用推荐配置”，就直接落盘。
+- 如果用户说要修改，再一次性接收改动项；只有缺少条件项时才补问。
+- `core_confirm_together_ids` 里的项目应体现在推荐摘要里，但不需要逐条来回追问。
+- `conditional_groups` 里的项目，只在条件成立时再追问。
+- 特别注意：
+  - 如果离机归档保持关闭，不要继续追问归档目录、warning 阈值、critical 阈值。
+  - 如果离机归档开启，必须补齐 `--nas-root`；需要时再确认 warning / critical 阈值。
 
 离机归档目标不要求一定是 NAS。
 任何稳定可写的 SMB 共享目录都可以作为归档仓库。
@@ -50,11 +51,11 @@ python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py setup-plan --jso
 例如：
 
 ```bash
-python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py configure --auto on --cadence two-weeks --weekday 0 --time 03:30 --local-root "$HOME/OpenClawBackups/openclaw-snapshots" --local-keep 3 --nas off --alert-delivery recent-channel
+python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py configure --auto on --cadence two-weeks --weekday 0 --time 03:30 --timezone Asia/Shanghai --local on --local-root "$HOME/OpenClawBackups/openclaw-snapshots" --local-keep 3 --nas off --alert-delivery recent-channel
 ```
 
 如果用户开启离机归档，必须明确给出 `--nas-root`；
-必要时再给 `--nas-staging-root`。
+必要时再给 `--nas-staging-root`、`--warn-gib`、`--critical-gib`。
 
 ## 回显
 

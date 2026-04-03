@@ -81,20 +81,25 @@ description: 管理 OpenClaw 运行目录的本机快照和可选离机归档。
 python3 {manage_script} setup-plan --json
 ```
 
-然后根据返回内容与用户确认配置。默认建议是：
-- 自动备份：开启
-- 节奏：两周一次
-- 本机快照：开启，默认目录，最多保留 3 份
-- 离机归档：默认关闭，只有在 SMB 共享路径稳定可写时再开
-- 提醒回传：最近一次交互渠道
+然后把返回结果里的 `recommended_questions` 当作首次配置清单。
+
+必须遵守：
+- 默认先整理成一份“推荐配置摘要”，一次性发给用户确认，不要把首次配置拆成一问一答。
+- 如果用户说“直接采用推荐配置”，就直接落盘。
+- 如果用户说要修改，再一次性接收改动项；只有缺少条件项时才补问。
+- `core_confirm_together_ids` 里的项目要体现在摘要里，但不需要逐条来回盘问。
+- `conditional_groups` 里的项目，只在条件成立时再追问。
+- 特别注意：
+  - 如果离机归档保持关闭，不要继续追问归档目录、warning 阈值、critical 阈值。
+  - 如果离机归档开启，必须补齐 `--nas-root`；需要时再确认 warning / critical 阈值。
 
 拿到用户答案后，只通过一条 `configure` 命令落盘。例如：
 
 ```bash
-python3 {manage_script} configure --auto on --cadence two-weeks --weekday 0 --time 03:30 --local-root "$HOME/OpenClawBackups/openclaw-snapshots" --local-keep 3 --nas off --alert-delivery recent-channel
+python3 {manage_script} configure --auto on --cadence two-weeks --weekday 0 --time 03:30 --timezone Asia/Shanghai --local on --local-root "$HOME/OpenClawBackups/openclaw-snapshots" --local-keep 3 --nas off --alert-delivery recent-channel
 ```
 
-如果用户开启离机归档，必须明确给出 `--nas-root`，必要时再给 `--nas-staging-root`。
+如果用户开启离机归档，必须明确给出 `--nas-root`，必要时再给 `--nas-staging-root`、`--warn-gib`、`--critical-gib`。
 
 如果用户额外提出高级需求，也可以继续加这些参数：
 
