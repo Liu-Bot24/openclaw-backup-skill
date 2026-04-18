@@ -33,11 +33,9 @@ from openclaw_backup_snapshot import (
 
 
 def detect_installed_workspace() -> Path | None:
-    candidate = Path(__file__).resolve().parent.parent
-    if candidate.name == "workspace":
-        return candidate
-    if (candidate / "skills").exists():
-        return candidate
+    for candidate in Path(__file__).resolve().parents:
+        if candidate.name == "workspace" and (candidate / "skills").exists():
+            return candidate
     return None
 
 
@@ -74,6 +72,22 @@ DEFAULT_CHANGE_EXCLUDES = [
 
 def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
+
+
+def path_contains(parent: Path, child: Path) -> bool:
+    try:
+        child.relative_to(parent)
+        return True
+    except ValueError:
+        return False
+
+
+def ensure_outside_source(source: Path, candidate: Path, *, label: str) -> None:
+    if path_contains(source, candidate):
+        raise SnapshotError(
+            f"{label} cannot live inside the backup source directory: {candidate}. "
+            f"Choose a path outside {source}."
+        )
 
 
 def load_json(path: Path, default: Any = None) -> Any:
@@ -996,6 +1010,16 @@ def apply_configure(args: argparse.Namespace, settings_path: Path, policy_path: 
         raise SnapshotError("local backup root cannot be empty")
     if settings["nas"]["enabled"] and not str(settings["nas"]["root"]).strip():
         raise SnapshotError("NAS backup is enabled, but nas root is empty")
+
+    source_root = resolve_path(settings["source"])
+    if settings["local"]["enabled"]:
+        ensure_outside_source(source_root, resolve_path(settings["local"]["root"]), label="local backup root")
+    nas_root_value = str(settings["nas"]["root"]).strip()
+    if nas_root_value:
+        ensure_outside_source(source_root, resolve_path(nas_root_value), label="NAS backup root")
+    nas_staging_value = str(settings["nas"]["staging_root"]).strip()
+    if nas_staging_value:
+        ensure_outside_source(source_root, resolve_path(nas_staging_value), label="NAS staging root")
 
     settings["last_configured_at"] = iso_now()
     policy = render_policy(settings)

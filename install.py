@@ -13,10 +13,10 @@ from openclaw_backup_skill.installer import (
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Installer for the openclaw-backup skill project")
+    parser = argparse.ArgumentParser(description="Installer for the openclaw-backup skill")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    install = subparsers.add_parser("install-openclaw", help="Install scripts and SKILL.md into an OpenClaw workspace")
+    install = subparsers.add_parser("install-openclaw", help="Install the skill into an OpenClaw workspace")
     install.add_argument("--workspace", help="OpenClaw workspace path. Defaults to ~/.openclaw/workspace")
 
     status = subparsers.add_parser("status", help="Show whether the skill is installed in an OpenClaw workspace")

@@ -4,9 +4,13 @@
 
 ## 安装
 
-1. clone 仓库到合适的本地目录
-2. 进入仓库目录
-3. 执行：
+优先把仓库安装成一个真正可加载的 workspace skill：
+
+1. clone 仓库到 `~/.openclaw/workspace/skills/openclaw-backup`
+2. 确认目录下存在 `SKILL.md`
+3. 确认目录下存在 `scripts/openclaw_backup_manage.py`
+
+如果用户的 workspace 不在默认位置，或需要同时保留兼容用的 `workspace/scripts/` 副本，则：
 
 ```bash
 python3 install.py install-openclaw
@@ -25,7 +29,7 @@ python3 install.py install-openclaw --workspace /path/to/.openclaw/workspace
 先运行：
 
 ```bash
-python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py setup-plan --json
+python3 ~/.openclaw/workspace/skills/openclaw-backup/scripts/openclaw_backup_manage.py setup-plan --json
 ```
 
 然后把返回结果里的 `recommended_questions` 当作首次配置清单。
@@ -43,6 +47,7 @@ python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py setup-plan --jso
 
 离机归档目标不要求一定是 NAS。
 任何稳定可写的 SMB 共享目录都可以作为归档仓库。
+本机快照目录、离机归档目录和离机暂存目录都必须位于备份源目录之外。
 
 ## 落盘
 
@@ -51,7 +56,7 @@ python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py setup-plan --jso
 例如：
 
 ```bash
-python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py configure --auto on --cadence two-weeks --weekday 0 --time 03:30 --timezone Asia/Shanghai --local on --local-root "$HOME/OpenClawBackups/openclaw-snapshots" --local-keep 3 --nas off --alert-delivery recent-channel
+python3 ~/.openclaw/workspace/skills/openclaw-backup/scripts/openclaw_backup_manage.py configure --auto on --cadence two-weeks --weekday 0 --time 03:30 --timezone Asia/Shanghai --local on --local-root "$HOME/OpenClawBackups/openclaw-snapshots" --local-keep 3 --nas off --alert-delivery recent-channel
 ```
 
 如果用户开启离机归档，必须明确给出 `--nas-root`；
@@ -62,7 +67,7 @@ python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py configure --auto
 配置完成后运行：
 
 ```bash
-python3 ~/.openclaw/workspace/scripts/openclaw_backup_manage.py status
+python3 ~/.openclaw/workspace/skills/openclaw-backup/scripts/openclaw_backup_manage.py status
 ```
 
 然后把最终状态用简洁自然语言告诉用户。

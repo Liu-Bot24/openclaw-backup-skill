@@ -30,11 +30,9 @@ from openclaw_backup_snapshot import (
 
 
 def detect_installed_workspace() -> Path | None:
-    candidate = Path(__file__).resolve().parent.parent
-    if candidate.name == "workspace":
-        return candidate
-    if (candidate / "skills").exists():
-        return candidate
+    for candidate in Path(__file__).resolve().parents:
+        if candidate.name == "workspace" and (candidate / "skills").exists():
+            return candidate
     return None
 
 
